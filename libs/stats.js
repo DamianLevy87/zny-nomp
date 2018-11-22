@@ -303,36 +303,44 @@ module.exports = function(logger, portalConfig, poolConfigs){
 
                         var workers = {};
 
-                        for (var i in pays[1]) {
-                            if (Math.abs(i % 2) != 1) {
-                                workerName = String(pays[1][i]);
-                                workers[workerName] = (workers[workerName] || {});
-                            } else {
-                                paidAmount = parseFloat(pays[1][i]);
-                                workers[workerName].paid = coinsRound(paidAmount);
-                                totalPaid += paidAmount;
-                            }
-                        }
-                        for (var b in bals[1]) {
-                            if (Math.abs(b % 2) != 1) {
-                                workerName = String(bals[1][b]);
-                                workers[workerName] = (workers[workerName] || {});
-                            } else {
-                                balAmount = parseFloat(bals[1][b]);
-                                workers[workerName].balance = coinsRound(balAmount);
-                                totalHeld += balAmount;
-                            }
-                        }
-                        for (var b in pends[1]) {
-                            if (Math.abs(b % 2) != 1) {
-                                workerName = String(pends[1][b]);
-                                workers[workerName] = (workers[workerName] || {});
-                            } else {
-                                pendingAmount = parseFloat(pends[1][b]);
-                                workers[workerName].immature = coinsRound(pendingAmount);
-                                totalImmature += pendingAmount;
-                            }
-                        }
+						if (pays) {
+							for (var i in pays[1]) {
+								if (Math.abs(i % 2) != 1) {
+									workerName = String(pays[1][i]);
+									workers[workerName] = (workers[workerName] || {});
+								} else {
+									paidAmount = parseFloat(pays[1][i]);
+									workers[workerName].paid = coinsRound(paidAmount);
+									totalPaid += paidAmount;
+								}
+							}
+						}
+						
+						if (bals) {
+							for (var b in bals[1]) {
+								if (Math.abs(b % 2) != 1) {
+									workerName = String(bals[1][b]);
+									workers[workerName] = (workers[workerName] || {});
+								} else {
+									balAmount = parseFloat(bals[1][b]);
+									workers[workerName].balance = coinsRound(balAmount);
+									totalHeld += balAmount;
+								}
+							}
+						}
+						
+						if (pends) {
+							for (var b in pends[1]) {
+								if (Math.abs(b % 2) != 1) {
+									workerName = String(pends[1][b]);
+									workers[workerName] = (workers[workerName] || {});
+								} else {
+									pendingAmount = parseFloat(pends[1][b]);
+									workers[workerName].immature = coinsRound(pendingAmount);
+									totalImmature += pendingAmount;
+								}
+							}
+						}
 
                         for (var w in workers) {
                             balances.push({

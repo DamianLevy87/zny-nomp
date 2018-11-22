@@ -172,12 +172,11 @@ function SetupForPool(logger, poolOptions, setupFinished){
             return;
         }
         if (paymentInterval) {
-            //clearInterval(paymentInterval);
             clearTimeout(paymentInterval);
         }
-        paymentInterval = setTimeout(processPayments, paymentIntervalSecs * 1000);
-        //paymentInterval = setInterval(processPayments, paymentIntervalSecs * 1000);
-        //setTimeout(processPayments, 100);
+        paymentInterval = setTimeout(function() {
+			processPayments(poolOptions);
+		}, paymentIntervalSecs * 1000);
         setupFinished(true);
     }
 
@@ -572,7 +571,7 @@ function SetupForPool(logger, poolOptions, setupFinished){
     /* Deal with numbers in smallest possible units (satoshis) as much as possible. This greatly helps with accuracy
        when rounding and whatnot. When we are storing numbers for only humans to see, store in whole coin units. */
 
-    var processPayments = function(){
+    var processPayments = function(poolOptions){
 
         var startPaymentProcess = Date.now();
 
@@ -1154,15 +1153,18 @@ function SetupForPool(logger, poolOptions, setupFinished){
                     for (var a in addressAmounts) {
                         addressAmounts[a] = coinsRound(addressAmounts[a]);
                     }
+					
+					// If you wallet address marked, please set the accountName
+					// option for address. If not market set the empty string them.
+					var accountName = poolOptions.accountName ? poolOptions.accountName : "";
 
                     // POINT OF NO RETURN! GOOD LUCK!
                     // WE ARE SENDING PAYMENT CMD TO DAEMON
 
                     // perform the sendmany operation .. addressAccount
-                    var rpccallTracking = 'sendmany "" '+JSON.stringify(addressAmounts);
-                    //console.log(rpccallTracking);
+                    var rpccallTracking = 'sendmany "' + accountName + '" ' + JSON.stringify(addressAmounts);
 
-                    daemon.cmd('sendmany', ["", addressAmounts], function (result) {
+                    daemon.cmd('sendmany', [accountName, addressAmounts], function (result) {
                         // check for failed payments, there are many reasons
                         if (result.error && result.error.code === -6) {
                             // check if it is because we don't have enough funds
@@ -1380,7 +1382,6 @@ function SetupForPool(logger, poolOptions, setupFinished){
                 redisClient.multi(finalRedisCommands).exec(function(error, results){
                     endRedisTimer();
                     if (error) {
-                        //clearInterval(paymentInterval);
                         clearTimeout(paymentInterval);
                         disablePeymentProcessing = true;
 
@@ -1399,7 +1400,9 @@ function SetupForPool(logger, poolOptions, setupFinished){
 
         ], function(){
             if (!disablePeymentProcessing) {
-                paymentInterval = setTimeout(processPayments, paymentIntervalSecs * 1000);
+                paymentInterval = setTimeout(function() {
+					processPayments(poolOptions);
+				}, paymentIntervalSecs * 1000);
             }
 
             var paymentProcessTime = Date.now() - startPaymentProcess;
