@@ -8,6 +8,8 @@
     "rewardRecipients": {
         "PlaceBinariumAddressHere": 1.0
     },
+	
+	"coinbaseText": "/nodeStratum/",
 
     "paymentProcessing": {
 		"minConf": 100,
